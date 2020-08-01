@@ -11,6 +11,7 @@ router.post("/upload", (req, res) => {
   let form = new formidable.IncomingForm({
     uploadDir: "./upload",
     keepExtensions: true,
+    multiple: true,
   });
 
   form.parse(req, (err, fields, files) => {

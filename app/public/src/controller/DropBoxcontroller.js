@@ -3,6 +3,7 @@ class DropBoxController {
     this.btnSendFileEl = document.querySelector("#btn-send-file");
     this.inputFilesEl = document.querySelector("#files");
     this.snackModalEl = document.querySelector("#react-snackbar-root");
+    this.progressBarEl = document.querySelector(".mc-progress-bar-fg");
     this.initEvents();
   }
 
@@ -16,30 +17,48 @@ class DropBoxController {
     });
   }
 
+  // Promise
   uploadTask(files) {
     let promises = [];
-    let options = {
-      method: "POST",
-    };
 
     [...files].forEach((file) => {
-      fetch("./upload", options)
-        .then((body) => {
-          promises.push(body.text());
-        })
-        .then((response) => {
-          promises.push(response);
+      let respostaPromise = new Promise((resolve, reject) => {
+        const ajax = new XMLHttpRequest();
+        ajax.open("POST", "./upload");
+        ajax.onload = (event) => {
+          try {
+            resolve(JSON.parse(ajax.responseText));
+          } catch (e) {
+            reject(e);
+          }
+        };
 
-          let formData = new FormData();
-          formData.append("input-file", file);
+        ajax.onerror = (event) => {
+          reject(event);
+        };
 
-          return formData;
-        })
-        .catch((erro) => {
-          console.log("Está osso fiote.", erro);
-        });
+        ajax.upload.onprogress = (event) => {
+          this.uploadProgress(event, file);
+          console.log(event);
+        };
+
+        let formData = new FormData();
+        formData.append("input-file", file);
+        ajax.send(formData);
+      });
+      promises.push(respostaPromise);
     });
-    console.log(promises);
+
     return Promise.all(promises);
+  }
+
+  // Progresso do arquivo
+  uploadProgress(event, file) {
+    let loaded = event.loaded;
+    let total = event.total;
+    let porcent = parseInt((loaded / total) * 100);
+
+    this.progressBarEl.style.width = `${porcent}%`;
+    console.log(this.progressBarEl);
   }
 }
