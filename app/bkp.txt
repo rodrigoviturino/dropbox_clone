@@ -1,0 +1,61 @@
+  uploadTask(files) {
+    let promises = [];
+    let options = {
+      method: "POST",
+      body: {
+        promises,
+      },
+    };
+
+    [...files].forEach((file) => {
+      fetch("/upload", options)
+        .then((body) => {
+          let t = body.text();
+          promises.push(t);
+        })
+        .then((response) => {
+          promises.push(response);
+
+          let formData = new FormData();
+          formData.append("input-file", file);
+
+          return formData;
+        })
+        .catch((erro) => {
+          console.log("Está osso fiote.", erro);
+        });
+    });
+
+    return Promise.all(promises);
+  }
+
+  // Promise
+    uploadTask(files) {
+    let promises = [];
+
+    [...files].forEach((file) => {
+      promises.push(
+        new Promise((resolve, reject) => {
+          const ajax = new XMLHttpRequest();
+          ajax.open("POST", "./upload");
+          ajax.onload = (event) => {
+            try {
+              resolve(JSON.parse(ajax.responseText));
+            } catch (e) {
+              reject(e);
+            }
+          };
+
+          ajax.onerror = (event) => {
+            reject(event);
+          };
+
+          let formData = new FormData();
+          formData.append("input-file", file);
+          ajax.send(formData);
+        })
+      );
+    });
+
+    return Promise.all(promises);
+  }

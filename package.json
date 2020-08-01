@@ -19,5 +19,8 @@
   "dependencies": {
     "ionicons": "^2.0.1",
     "bootstrap": "^4.1.0"
+  },
+  "devDependencies": {
+    "formidable": "^1.2.2"
   }
 }
