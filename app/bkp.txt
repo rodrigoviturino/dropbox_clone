@@ -59,3 +59,84 @@
 
     return Promise.all(promises);
   }
+
+  /***** AJAX ATUALIZADO
+    // Promise
+  uploadTask(files) {
+    let promises = [];
+
+    [...files].forEach((file) => {
+      let respostaPromise = new Promise((resolve, reject) => {
+        const ajax = new XMLHttpRequest();
+        ajax.open("POST", "./upload");
+        ajax.onload = (event) => {
+          try {
+            resolve(JSON.parse(ajax.responseText));
+          } catch (e) {
+            reject(e);
+          }
+        };
+
+        ajax.onerror = (event) => {
+          reject(event);
+        };
+
+        ajax.upload.onprogress = (event) => {
+          this.uploadProgress(event, file);
+          console.log(event);
+        };
+
+        let formData = new FormData();
+        formData.append("input-file", file);
+        ajax.send(formData);
+      });
+      promises.push(respostaPromise);
+    });
+
+    return Promise.all(promises);
+  }
+
+  // Progresso do arquivo
+  uploadProgress(event, file) {
+    let loaded = event.loaded;
+    let total = event.total;
+    let porcent = parseInt((loaded / total) * 100);
+
+    this.progressBarEl.style.width = `${porcent}%`;
+    console.log(this.progressBarEl);
+  }
+
+
+  /*** TENTATIVA COM FETCH AWAIT
+    // AJAX
+  uploadTask(files) {
+    let promises = [];
+
+    [...files].forEach((file) => {
+      async function teste() {
+        try {
+          const uploadResponse = fetch("./upload", { method: "POST" });
+          const uploadJson = await (await uploadResponse).json();
+        } catch (erro) {
+          console.log(erro);
+        }
+        let ajax = new XMLHttpRequest();
+
+        let formData = new FormData();
+        formData.append("input-file", file);
+        ajax.send(formData);
+      }
+
+      teste();
+    });
+  }
+
+  uploadProgress(event, file) {
+    let loaded = event.loaded;
+    let total = event.total;
+    let porcent = parseInt((loaded / total) * 100);
+
+    this.progressBarEl.style.width = `${porcent}%`;
+    console.log(this.progressBarEl);
+  }
+}
